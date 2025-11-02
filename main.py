@@ -1,10 +1,11 @@
 import time
 import os
-import sys
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
-from selenium.common.exceptions import WebDriverException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import Select
 
 
 def get_chromedriver_path():
@@ -18,33 +19,40 @@ def get_chromedriver_path():
     return None
 
 
-def main():
-    chromedriver_path = get_chromedriver_path()
-    if chromedriver_path is None:
-        print("Error: chromedriver.exe not found in the project directory.")
-        print("Place chromedriver.exe next to main.py or update the path in get_chromedriver_path().")
-        sys.exit(1)
-
-    options = Options()
-    # Keep default visible browser; set page load strategy as requested
-    options.page_load_strategy = 'normal'
-
-    service = Service(executable_path=chromedriver_path)
-
-    try:
-        driver = webdriver.Chrome(service=service, options=options)
-    except WebDriverException as e:
-        print(f"Failed to start Chrome WebDriver: {e}")
-        print("Check that the chromedriver version matches your Chrome browser.")
-        sys.exit(1)
-
-    try:
-        driver.get("https://www.facebook.com")
-        # Let the page load and observe it for 10 seconds
-        time.sleep(10)
-    finally:
-        driver.quit()
+chromedriver_path = get_chromedriver_path()
+options = Options()
+service = Service(executable_path=chromedriver_path)
+driver = webdriver.Chrome(service=service, options=options)
 
 
-if __name__ == "__main__":
-    main()
+def facebook_account_create():
+    fname = "Habib"
+    lname = "Rahman"
+    email = "email@gmail.com"
+    password = "123456"
+    driver.get("https://www.facebook.com/")
+    # driver.find_element(By.NAME, "email").send_keys(email)
+    # driver.find_element(By.NAME, "pass").send_keys(pwd)
+    # button = driver.find_element(By.NAME, "login")
+    # button.send_keys(Keys.ENTER)
+    button = driver.find_element(By.LINK_TEXT, "Create new account")
+    button.send_keys(Keys.ENTER)
+    driver.find_element(By.NAME, "firstname").send_keys(fname)
+    driver.find_element(By.NAME, "lastname").send_keys(lname)
+    day_select = Select(driver.find_element(By.NAME, "birthday_day"))
+    month_select = Select(driver.find_element(By.NAME, "birthday_month"))
+    year_select = Select(driver.find_element(By.NAME, "birthday_year"))
+    day_select.select_by_value("28")
+    month_select.select_by_value("10")
+    year_select.select_by_value("1990")
+    male_checkbox = driver.find_element(By.XPATH, "//input[@name='sex' and @value='2']")
+    male_checkbox.click()
+    driver.find_element(By.NAME, "reg_email__").send_keys(email)
+    driver.find_element(By.NAME, "reg_passwd__").send_keys(password)
+    driver.find_element(By.NAME, "websubmit").click()
+
+    time.sleep(5)
+    driver.quit()
+
+
+facebook_account_create()
